@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beach Tennis League</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Beach League">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0B3C49">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#0B3C49}
+iframe{position:fixed;left:0;width:100%;top:env(safe-area-inset-top);height:calc(100% - env(safe-area-inset-top));border:0;background:#F6F0E4}
+#msg{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#cfe3e8;font:600 18px system-ui,sans-serif;z-index:-1}
+</style></head>
+<body>
+<div id="msg">Beach Tennis League…</div>
+<script>
+// Link dell'app Google (finisce con /exec). Sostituisci il testo tra apici con il tuo link.
+var APP = 'INCOLLA-QUI-IL-LINK-/exec';
+// Memoria nella pagina esterna: iOS cancella quella dentro l'app Google.
+// L'app invia qui giocatore e accesso admin, e a ogni apertura li riceve nel link (?me= e ?adm=).
+var ST = {
+  get: function (k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } },
+  set: function (k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} }
+};
+var q = [], me = ST.get('mpsc_bt_giocatore'), adm = ST.get('mpsc_bt_admin');
+var mine = new URLSearchParams(location.search);
+if (mine.get('me')) me = mine.get('me');
+if (mine.get('adm')) adm = mine.get('adm');
+if (me) q.push('me=' + encodeURIComponent(me));
+if (adm) q.push('adm=' + encodeURIComponent(adm));
+window.addEventListener('message', function (e) {
+  if (e.origin !== 'null' && !/^https:\/\/([a-z0-9-]+\.)*(googleusercontent|google)\.com$/.test(e.origin)) return;
+  var d = e.data;
+  if (!d || d.mpsc !== 1 || (d.k !== 'mpsc_bt_giocatore' && d.k !== 'mpsc_bt_admin')) return;
+  ST.set(d.k, String(d.v || ''));
+});
+var f = document.createElement('iframe');
+f.src = APP + (q.length ? '?' + q.join('&') : '');
+f.setAttribute('allow', 'clipboard-write');
+document.body.appendChild(f);
+</script>
+</body></html>
